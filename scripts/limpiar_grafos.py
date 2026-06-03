@@ -5,7 +5,7 @@ import networkx as nx
 # 1. CARGAR CSV
 # =========================================
 
-df = pd.read_csv("edges.csv")
+df = pd.read_csv("data/edges.csv")
 
 print("Primeras filas:")
 print(df.head())
@@ -21,7 +21,7 @@ df = df.dropna()
 df = df[df["source"] != df["target"]]
 
 # eliminar pesos bajos
-UMBRAL_PESO = 2
+UMBRAL_PESO = 1
 
 df = df[df["weight"] >= UMBRAL_PESO]
 
@@ -39,6 +39,9 @@ G = nx.from_pandas_edgelist(
     edge_attr="weight",
     create_using=nx.Graph()
 )
+
+print("Nodos:", G.number_of_nodes())
+print("Aristas:", G.number_of_edges())
 
 # Si quieres dirigido:
 # create_using=nx.DiGraph()
@@ -58,10 +61,18 @@ G.remove_nodes_from(isolated)
 # =========================================
 
 print("\nInformación del grafo:")
-print(nx.info(G))
+print(f"Número de nodos: {G.number_of_nodes()}")
+print(f"Número de aristas: {G.number_of_edges()}")
 
-print("Número de componentes conectados:")
-print(nx.number_connected_components(G))
+print(
+    f"Número de componentes conectados: "
+    f"{nx.number_connected_components(G)}"
+)
+
+print(
+    f"Densidad: "
+    f"{nx.density(G):.6f}"
+)
 
 # =========================================
 # 6. COMPONENTE GIGANTE
@@ -72,13 +83,14 @@ largest_cc = max(nx.connected_components(G), key=len)
 G = G.subgraph(largest_cc).copy()
 
 print("\nComponente gigante:")
-print(nx.info(G))
+print(f"Nodos: {G.number_of_nodes()}")
+print(f"Aristas: {G.number_of_edges()}")
 
 # =========================================
 # 7. GUARDAR
 # =========================================
 
-nx.write_graphml(G, "grafo.graphml")
-nx.write_gml(G, "grafo.gml")
+nx.write_graphml(G, "data/grafo.graphml")
+nx.write_gml(G, "data/grafo.gml")
 
 print("\nArchivos exportados correctamente.")
